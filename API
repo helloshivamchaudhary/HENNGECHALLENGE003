@@ -1,0 +1,34 @@
+import json
+import pyotp
+import requests
+
+# Step 1: Construct the JSON String
+github_url = "https://gist.github.com/helloshivamchaudhary/fb6967cff2e28df04d11b4649b8d2b33"
+contact_email = "shivamchaudhary1106@gmail.com"
+solution_language = "python"
+
+data = {
+    "github_url": github_url,
+    "contact_email": contact_email,
+    "solution_language": solution_language
+}
+
+json_data = json.dumps(data)
+
+# Step 2: Generate the TOTP Password
+shared_secret = contact_email + "HENNGECHALLENGE003"
+totp = pyotp.TOTP(shared_secret, digest='sha512', digits=10, interval=30)
+password = totp.now()
+
+# Step 3: Send the HTTP POST Request
+url = "https://api.challenge.hennge.com/challenges/003"
+headers = {
+    "Content-Type": "application/json",
+    "Authorization": f"Basic {contact_email}:{password}"
+}
+
+response = requests.post(url, headers=headers, data=json_data)
+
+# Print the response
+print("Status Code:", response.status_code)
+print("Response:", response.json())
